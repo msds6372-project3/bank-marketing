@@ -4,8 +4,6 @@
 
 [Data Science @ Southern Methodist University](https://datascience.smu.edu/)
 
-![Source: bitcoin.com](/images/readme1.png)
-
 # Table of Contents
 * [Team Members](#team-members)
 * [Introduction](#introduction)
