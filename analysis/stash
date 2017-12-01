@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Nov 30 15:13:41 2017
+
+@author: Jostein
+"""
+from scipy.cluster.hierarchy import dendrogram, linkage
+from scipy.cluster.hierarchy import cophenet
+from scipy.spatial.distance import pdist
+
+# Hierarchical Clustering
+# Source: https://joernhees.de/blog/2015/08/26/scipy-hierarchical-clustering-and-dendrogram-tutorial/
+bank_new = linkage(bank, 'ward')
+
+c, coph_dists = cophenet(bank_new, pdist(X))
+c
+
+# Dendrogram
+plt.figure(figsize=(25, 10))
+plt.title('Hierarchical Clustering Dendrogram')
+plt.xlabel('sample index')
+plt.ylabel('distance')
+dendrogram(
+    bank,
+    leaf_rotation=90.,  # rotates the x axis labels
+    leaf_font_size=8.,  # font size for the x axis labels
+)
+plt.show()
+
+
+# For loop testing stuff
+bank.head()
+
+bank.dtypes
+bank.head()
+
+np.integer(bank['age'])
+
+isinstance(bank['age'].dtypes, object)
+bank['age'].dtypes
+bank['age']
+
+type(bank.columns) == np.int
+
+bank['age'].dtypes == 'int64'
+bank['age'].is_integer()

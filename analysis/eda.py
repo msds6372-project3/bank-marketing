@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy as sp
+import seaborn as sns
 
 # Source: https://www.datacamp.com/community/tutorials/exploratory-data-analysis-python
 # Load in the data
@@ -27,4 +28,24 @@ df = pd.DataFrame(data=bank)
 # Check the data types
 df.dtypes
 
-#labels, levels = pd.factorize(df.Class)
+# https://seaborn.pydata.org/generated/seaborn.countplot.html
+sns.set(style="darkgrid")
+sns.countplot(x='y', data=bank, palette='hls')
+
+
+# Factorize categorical variables
+# labels, levels = pd.factorize(df.Class)
+# Source: http://www.data-mania.com/blog/logistic-regression-example-in-python/
+
+# For loop to encode dummy variables
+bank_new = pd.DataFrame()
+for column in bank.columns:
+    if bank[column].dtypes != 'int64' and column != 'y':
+        temp = column + '_id'
+        temp = pd.get_dummies(bank[column], drop_first=True)
+        print(temp.head())
+        #result = pd.concat(temp)
+        data1 = bank.join(temp)
+
+data1.head()
+
