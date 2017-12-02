@@ -18,6 +18,8 @@ pd.isnull(bank).sum()
 
 # Snapshot of the data
 bank.head()
+# TO DO: No N/A's, but figure out what to do with Unknown category
+
 # Summary statistics for variables
 bank.describe()
 
@@ -49,3 +51,10 @@ for column in bank.columns:
 
 data1.head()
 
+# Asha
+%matplotlib inline
+pd.crosstab(df.education,df.y).plot(kind='bar')
+plt.title('Purchase Frequency for education type')
+plt.xlabel('Education')
+plt.ylabel('Frequency of Purchase')
+plt.savefig('purchase_fre_education')
