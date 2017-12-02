@@ -45,3 +45,22 @@ type(bank.columns) == np.int
 
 bank['age'].dtypes == 'int64'
 bank['age'].is_integer()
+
+# For loop to encode dummy variables
+bank_new = pd.DataFrame()
+for column in bank.columns:
+    if bank[column].dtypes != 'int64' and column != 'y':
+        temp = column + '_id'
+        temp = pd.get_dummies(bank[column], drop_first=True)
+        print(temp.head())
+        #result = pd.concat(temp)
+        data1 = bank.join(temp)
+
+data1.head()
+
+new_bank = pd.Series(bank[['job', 'marital', 'education',
+                          'default', 'housing', 'loan',
+                          'contact', 'month', 'poutcome',
+                          'y']], dtype="category")
+new_bank.dtypes
+new_bank.head()
