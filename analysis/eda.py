@@ -67,8 +67,8 @@ for col in imput_vars:
         print('Unknowns in ' + col + ' variable imputed successfully!')
     plt.figure()
     sns.countplot(y=col, data=bank, palette='hls')
-    plt.savefig('/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/plots/'
-                + col + 'imput_count_plot')
+    plt.savefig('/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/'
+                + 'plots/' + col + 'imput_count_plot')
 
 # Snapshot of the data
 bank.head()
@@ -105,13 +105,34 @@ new_bank.head()
 plt.figure()
 sns.factorplot(y='age', palette="Set3", col="y",
                data=bank, kind="count", size=10, aspect=.7)
-plt.savefig('/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/plots/dist_age_termdeposit')
+plt.savefig('/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/'
+            + 'plots/dist_age_termdeposit')
+
+# Distribution of people who subscribe for a term deposit vs don't
+# based on their education level
+plt.figure()
+sns.factorplot(x='education', palette="Set3", col="y",
+               data=bank, kind="count", size=4, aspect=.7)
+plt.savefig('/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/'
+            + 'plots/dist_educ_termdeposit')
+
+for col in cat_vars:
+    plt.figure()
+    sns.factorplot(x=col, palette="husl", col="y",
+                   data=bank, kind="count", size=5, aspect=.7)
+    plt.savefig('/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/'
+                + 'plots/dist_' + col + '_termdeposit')
 
 # Now that dummy variables are coded, we can create a
 # heat map of the correlation between variables
 # Source:
-# http://www.data-mania.com/blog/logistic-regression-example-in-python/
-plt.figure()
-sns.heatmap(new_bank.corr())
-plt.savefig('/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/plots/corr_heatmap')
-
+# http://seaborn.pydata.org/generated/seaborn.heatmap.html?highlight=heatmap#seaborn.heatmap
+corr = new_bank.corr(method='pearson')
+mask = np.zeros_like(corr)
+mask[np.triu_indices_from(mask)] = True
+with sns.axes_style("white"):
+    plt.figure()
+    bank_heatmap_corr = sns.heatmap(corr, mask=mask, square=True,
+                                    linewidths=.1, cmap="YlGnBu")
+    plt.savefig('/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/'
+                + '/plots/corr_heatmap')
