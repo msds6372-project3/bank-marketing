@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import scipy as sp
 import seaborn as sns
 import statistics as st
+import csv as csv
 
 # TO DO: Assess the fit- Hosmer and Lemeshow Goodness of fit
 # TO DO: ROC Curve
@@ -24,117 +25,93 @@ pd.isnull(bank).sum()
 # Deal with unknown values
 # No NA's, but there are unknowns
 # Let's plot each variable and see in which the unknowns occur
+# Source:
+# https://seaborn.pydata.org/generated/seaborn.countplot.html
+cat_vars = ['job', 'marital', 'education', 'default', 'housing', 'loan',
+            'contact', 'poutcome']
 sns.set(style="darkgrid")
-sns.countplot(y='job', data=bank, palette='hls') # Has unknowns
-sns.countplot(y='marital', data=bank, palette='hls')
-sns.countplot(y='education', data=bank, palette='hls') # Has unknowns
-sns.countplot(x='default', data=bank, palette='hls')
-#sns.countplot(y='balance', data=bank, palette='hls')
-sns.countplot(x='housing', data=bank, palette='hls')
-sns.countplot(x='loan', data=bank, palette='hls')
-sns.countplot(x='contact', data=bank, palette='hls') # Unknowns, silly variable
-sns.countplot(x='poutcome', data=bank, palette='hls') # Has bigly unknowns
+for cat in cat_vars:
+    plt.figure()
+    sns.countplot(y=cat, data=bank, palette='hls')
+    plt.savefig(cat + '_count_plot')
+    if sum(bank[cat] == 'unknown') != 0:
+        print(cat + ' has unknown variables!')
 
 # Return the number of unknowns for variables:
 # job, education, contact, and poutcome
-print('The number of unknowns in job variable is: '
-      + str(sum(bank['job'] == 'unknown')))
+unknown_vars = ['job', 'education', 'contact', 'poutcome']
+for col in unknown_vars:
+    print('The number of unknowns in ' + col + ' variable is: '
+          + str(sum(bank[col] == 'unknown')))
 
-print('The number of unknowns in education variable is: '
-      + str(sum(bank['education'] == 'unknown')))
+pct_unknown_val = round(100 * (sum(bank['poutcome']=='unknown') / bank.shape[0]), 2)
+pct_failure_val = round(100 * (sum(bank['poutcome']=='failure') / bank.shape[0]), 2)
+pct_success_val = round(100 * (sum(bank['poutcome']=='success') / bank.shape[0]), 2)
 
-print('The number of unknowns in contact variable is: '
-      + str(sum(bank['contact'] == 'unknown')))
-
-print('The number of unknowns in poutcome variable is: '
-      + str(sum(bank['poutcome'] == 'unknown')))
+print('Unknown accounts for ' + str(pct_unknown_val) + '% of poutcome observations.')
+print('Failure accounts for ' + str(pct_failure_val) + '% of poutcome observations.')
+print('Success accounts for ' + str(pct_success_val) + '% of poutcome observations.')
 
 # Imputate the unknown values with the mode of their respective variable
 bank.replace({'job': {'unknown': 'blue-collar'}}, inplace=True)
 bank.replace({'education': {'unknown': 'secondary'}}, inplace=True)
 bank.replace({'contact': {'unknown': 'cellular'}}, inplace=True)
-bank.replace({'poutcome': {'unknown': 'failure'}}, inplace=True)
+
+imput_vars = ['job', 'education', 'contact']
 
 # Check to see if unknowns were imputed
-if sum(bank['job'] == 'unknown') == 0:
-    print('Unknowns in job variable imputed successfully!')
-if sum(bank['education'] == 'unknown') == 0:
-    print('Unknowns in education variable imputed successfully!')
-if sum(bank['contact'] == 'unknown') == 0:
-    print('Unknowns in contact variable imputed successfully!')
-if sum(bank['poutcome'] == 'unknown') == 0:
-    print('Unknowns in poutcome variable imputed successfully!')
-
-sns.countplot(y='job', data=bank, palette='hls')
-sns.countplot(y='education', data=bank, palette='hls')
-sns.countplot(x='contact', data=bank, palette='hls')
-sns.countplot(x='poutcome', data=bank, palette='hls')
-
-sum(bank['education'] == 'unknown')
-sns.countplot(y='job', data=bank, palette='hls')
+# Visually confirm unknowns were successfully imputed
+for col in imput_vars:
+    if sum(bank[col] == 'unknown') == 0:
+        print('Unknowns in ' + col + ' variable imputed successfully!')
+    plt.figure()
+    sns.countplot(y=col, data=bank, palette='hls')
+    plt.savefig(col + 'imput_count_plot')
 
 # Snapshot of the data
 bank.head()
-# TO DO: No N/A's, but figure out what to do with Unknown category
 
 # Summary statistics for variables
 bank.describe()
 
-# Turn the data into a data frame
-# Source:
-# http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html
-df = pd.DataFrame(data=bank)
-
 # Check the data types
 df.dtypes
 
-# https://seaborn.pydata.org/generated/seaborn.countplot.html
-sns.set(style="darkgrid")
-sns.countplot(x='y', data=bank, palette='hls')
+# Create new data set with categorical variables
+# encoded as dummy variables
+# Sources:
+# http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.merge.html#pandas.DataFrame.merge
+# http://pandas.pydata.org/pandas-docs/stable/generated/pandas.get_dummies.html
+smart_cols = ['age', 'balance', 'day', 'duration',
+              'campaign', 'pdays', 'previous']
+dum_cols = ['job', 'marital', 'education', 'default','housing', 
+            'loan', 'contact', 'month', 'poutcome', 'y']
+dum_bank = pd.get_dummies(bank[dum_cols], prefix=dum_cols, drop_first=True)
+dum_bank.head()
+dum_bank.columns
 
-# Default, housing, and loan are unkown
+new_bank = pd.DataFrame(bank[smart_cols]).join(dum_bank)
+new_bank.columns
+new_bank.head()
 
-# Factorize categorical variables
-# labels, levels = pd.factorize(df.Class)
-# Source: http://www.data-mania.com/blog/logistic-regression-example-in-python/
-# Python forgive me, for I have sinned
-# Yes I know the following is awful, but the for loop wasn't working
-job_dmy = pd.get_dummies(bank['job'], drop_first=True)
-marital_dmy = pd.get_dummies(bank['marital'], drop_first=True)
-education_dmy = pd.get_dummies(bank['education'], drop_first=True)
-default_dmy = pd.get_dummies(bank['default'], drop_first=True)
-housing_dmy = pd.get_dummies(bank['housing'], drop_first=True)
-loan_dmy = pd.get_dummies(bank['loan'], drop_first=True)
-contact_dmy = pd.get_dummies(bank['contact'], drop_first=True)
-month_dmy = pd.get_dummies(bank['month'], drop_first=True)
-poutcome_dmy = pd.get_dummies(bank['poutcome'], drop_first=True)
-y_dmy = pd.get_dummies(bank['y'], drop_first=True)
+# Now that dummy variables are coded, we can create a
+# heat map of the correlation between variables
+# Source:
+# http://www.data-mania.com/blog/logistic-regression-example-in-python/
+sns.heatmap(new_bank.corr())
 
-# Check the structure of the dummy variables
-job_dmy.head()
-marital_dmy.head()
-education_dmy.head()
-default_dmy.head()
-housing_dmy.head()
-loan_dmy.head()
-contact_dmy.head()
-month_dmy.head()
-poutcome_dmy.head()
-y_dmy.head()
+corr = np.corrcoef(new_bank)
+mask = np.zeros_like(corr)
+mask[np.triu_indices_from(mask)] = True
+with sns.axes_style("white"):
+    bank_heatmap_corr = sns.heatmap(corr, mask=mask, vmax=.3, square=True)
 
-bank.drop(['job', 'marital', 'education', 'default', 'housing',
-           'loan', 'contact', 'month', 'poutcome', 'y'], axis=1, inplace=True)
-
-# Check if variables were dropped
-bank.head()
-
-# Create new data frame with int and dummy variables
-bank_dmy = pd.concat([bank, job_dmy, marital_dmy, education_dmy, default_dmy,
-                      housing_dmy, loan_dmy, contact_dmy, month_dmy,
-                      poutcome_dmy, y_dmy], axis=1)
-bank_dmy.head()
-print(bank_dmy)
-
+# Source:
+# https://gis.stackexchange.com/questions/72458/export-list-of-values-into-csv-or-txt-file
+csvfile = '/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/data/bank_dmy.csv'
+with open(csvfile, "w") as output:
+    writer = csv.writer(output, lineterminator='')
+    writer.writerows(bank_dmy)
 
 # Asha
 %matplotlib inline
