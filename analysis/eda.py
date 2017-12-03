@@ -136,3 +136,29 @@ with sns.axes_style("white"):
                                     linewidths=.1, cmap="YlGnBu")
     plt.savefig('/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/'
                 + '/plots/corr_heatmap')
+
+# Python does not have an easy way to conduct Hosmer-Lemeshow test
+# Export new_bank data set to CSV for further analysis in R
+new_bank.to_csv('/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/'
+                + '/data/new_bank.csv', header=True, index=False)
+
+# Reduce memory usage before calculating cluster heat map
+plt.close('all')
+
+# Cluster Heat Map
+# Source:
+# http://seaborn.pydata.org/generated/seaborn.clustermap.html
+sns.set(color_codes=True)
+g = sns.clustermap(new_bank)
+
+sns.set(color_codes=True)
+iris = sns.load_dataset("iris")
+species = iris.pop("species")
+g = sns.clustermap(iris)
+
+plt.figure()
+sns.set(color_codes=True)
+y_yes = new_bank.pop('y_yes')
+lut = dict(zip(y_yes.unique(), "bg"))
+row_colors = y_yes.map(lut)
+g = sns.clustermap(new_bank, row_colors=row_colors, standard_scale=1)
