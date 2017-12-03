@@ -30,12 +30,13 @@ pd.isnull(bank).sum()
 cat_vars = ['job', 'marital', 'education', 'default', 'housing', 'loan',
             'contact', 'poutcome']
 sns.set(style="darkgrid")
-for cat in cat_vars:
+for col in cat_vars:
     plt.figure()
-    sns.countplot(y=cat, data=bank, palette='hls')
-    plt.savefig(cat + '_count_plot')
-    if sum(bank[cat] == 'unknown') != 0:
-        print(cat + ' has unknown variables!')
+    sns.countplot(y=col, data=bank, palette='hls')
+    plt.savefig('/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/plots/'
+                + col + '_count_plot')
+    if sum(bank[col] == 'unknown') != 0:
+        print(col + ' has unknown variables!')
 
 # Return the number of unknowns for variables:
 # job, education, contact, and poutcome
@@ -66,7 +67,8 @@ for col in imput_vars:
         print('Unknowns in ' + col + ' variable imputed successfully!')
     plt.figure()
     sns.countplot(y=col, data=bank, palette='hls')
-    plt.savefig(col + 'imput_count_plot')
+    plt.savefig('/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/plots/'
+                + col + 'imput_count_plot')
 
 # Snapshot of the data
 bank.head()
@@ -75,7 +77,7 @@ bank.head()
 bank.describe()
 
 # Check the data types
-df.dtypes
+bank.dtypes
 
 # Create new data set with categorical variables
 # encoded as dummy variables
@@ -94,29 +96,22 @@ new_bank = pd.DataFrame(bank[smart_cols]).join(dum_bank)
 new_bank.columns
 new_bank.head()
 
+# Exploratory Data Analysis
+# Source:
+# https://seaborn.pydata.org/generated/seaborn.countplot.html
+
+# First let's plot the distribution of people who subscribe 
+# for a term deposit vs don't based on their age
+plt.figure()
+sns.factorplot(y='age', palette="Set3", col="y",
+               data=bank, kind="count", size=10, aspect=.7)
+plt.savefig('/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/plots/dist_age_termdeposit')
+
 # Now that dummy variables are coded, we can create a
 # heat map of the correlation between variables
 # Source:
 # http://www.data-mania.com/blog/logistic-regression-example-in-python/
+plt.figure()
 sns.heatmap(new_bank.corr())
+plt.savefig('/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/plots/corr_heatmap')
 
-corr = np.corrcoef(new_bank)
-mask = np.zeros_like(corr)
-mask[np.triu_indices_from(mask)] = True
-with sns.axes_style("white"):
-    bank_heatmap_corr = sns.heatmap(corr, mask=mask, vmax=.3, square=True)
-
-# Source:
-# https://gis.stackexchange.com/questions/72458/export-list-of-values-into-csv-or-txt-file
-csvfile = '/Users/Jostein/Grad School/SMU/6372/project3/bank-marketing/data/bank_dmy.csv'
-with open(csvfile, "w") as output:
-    writer = csv.writer(output, lineterminator='')
-    writer.writerows(bank_dmy)
-
-# Asha
-%matplotlib inline
-pd.crosstab(df.education,df.y).plot(kind='bar')
-plt.title('Purchase Frequency for education type')
-plt.xlabel('Education')
-plt.ylabel('Frequency of Purchase')
-plt.savefig('purchase_fre_education')
