@@ -75,9 +75,11 @@ print('Failure accounts for ' + str(pct_failure_val) + '% of poutcome observatio
 print('Success accounts for ' + str(pct_success_val) + '% of poutcome observations.')
 
 # Imputate the unknown values with the mode of their respective variable
-bank.replace({'job': {'unknown': 'blue-collar'}}, inplace=True)
-bank.replace({'education': {'unknown': 'secondary'}}, inplace=True)
-bank.replace({'contact': {'unknown': 'cellular'}}, inplace=True)
+bank.replace({'job': {'unknown': 'admin.'}}, inplace=True)
+bank.replace({'marital': {'unknown': 'married'}}, inplace=True)
+bank.replace({'education': {'unknown': 'university.degree'}}, inplace=True)
+bank.replace({'housing': {'unknown': 'yes'}}, inplace=True)
+bank.replace({'loan': {'unknown': 'no'}}, inplace=True)
 
 imput_vars = ['job', 'education', 'contact']
 
