@@ -1,4 +1,4 @@
-# Logistic Regression and LDA of Bank Marketing Data
+# Logistic Regression of Bank Marketing Data
 ## MSDS 6372 - Section 402
 ## Project 3
 
